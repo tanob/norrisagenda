@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "interface.h"
+#include "io.h"
 #include "structure.h"
 
 /**
@@ -22,7 +23,7 @@ void infoPrograma() {
 void limpaTela() {
 #ifdef LINUX
 	system("clear");
-#elif
+#else
 	system("cls");
 #endif
 }
