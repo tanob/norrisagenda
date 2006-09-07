@@ -1,14 +1,19 @@
+/**
+	Modulo com funcoes para interface console
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "interface.h"
 #include "structure.h"
-#define LINUX
 
 /**
 	Imprime informacoes do programa
  */
 void infoPrograma() {
-	printf("Programa ED1-Agenda (C) 2006 Computa boys\n\n");
+	printf("Programa Norris-Agenda (C) 2006 Computa boys\n\n");
 }
 
 /**
@@ -79,5 +84,5 @@ void menuInicial() {
 	limpaTela();
 }
 
-		
+
 

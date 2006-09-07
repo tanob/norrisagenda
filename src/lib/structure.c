@@ -1,21 +1,11 @@
+/**
+	Modulo com funcoes para lidar com as estruturas
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 
-
-typedef struct _AgendaInfo {
-	FILE *arquivo; /* Manipulador do arquivo */
-
-	char ehAVL; /* Indica se eh balanceada ou nao */
-	char foiAlterada; /* Se a agenda foi aberta e alterada e suas alteracoes ainda nao foram salvas */
-
-	/*
-		A ideia eh guardar alguma outra estrutura de dados aqui,
-		como uma estrutura que valha tanto para a AVL qto para a nao-AVL,
-		talvez um "union" dessas estruturas...
-	*/
-
-} AgendaInfo;
-
+#include "structure.h"
 
 /**
 	Deve perguntar ao usuario se a agenda eh balanceada,
@@ -45,4 +35,3 @@ AgendaInfo *processoAbrirAgenda() {
  */
 void processoAbreAgenda(AgendaInfo *agenda) {
 }
-

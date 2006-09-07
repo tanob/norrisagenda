@@ -1,6 +1,12 @@
+/**
+	Modulo com funcoes de entrada/saida
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <strings.h>
+#include <string.h>
+
+#include "io.h"
 
 /**
 	Le um caractere do teclado, e verifica se
