@@ -9,5 +9,6 @@
 void infoPrograma();
 void limpaTela();
 void menuInicial();
+void mostraMenuAgenda(char);
 
 #endif /* !_INTERFACE_H */
