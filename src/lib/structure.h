@@ -20,10 +20,8 @@ typedef struct _AgendaInfo {
 
 } AgendaInfo;
 
-AgendaInfo *processoCriaAgenda();
 
-AgendaInfo *processoAbrirAgenda();
-
-void processoAbreAgenda(AgendaInfo *agenda);
+AgendaInfo *inicAgendaInfo();
+void finalizaAgendaInfo(AgendaInfo *);
 
 #endif /* !_STRUCTURE_H */

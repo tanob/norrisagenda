@@ -6,6 +6,8 @@
 
 #define _IO_H
 
-char leOpcao(char *chValidos);
+int leOpcao(int *opcoesValidas, char *valido);
+int leOpcaoValida(char *prompt, int *opcoesValidas, char *msgErro);
+char arquivoExiste(char *caminho);
 
 #endif /* !_IO_H */

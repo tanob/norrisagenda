@@ -9,6 +9,8 @@
 #include "interface.h"
 #include "io.h"
 #include "structure.h"
+#include "processos.h"
+
 
 /**
 	Imprime informacoes do programa
@@ -16,6 +18,7 @@
 void infoPrograma() {
 	printf("Programa Norris-Agenda (C) 2006 Computa boys\n\n");
 }
+
 
 /**
 	Limpa a tela do console
@@ -32,58 +35,69 @@ void limpaTela() {
 /**
 	Limpa a tela, imprime algum cabecalho com o nome do programa e
 	mostra ao usuario as 3 opcoes iniciais:
-		- (C)riar agenda
-		- (A)brir agenda
-		- (S)air
+		- 1. Criar agenda
+		- 2. Abrir agenda
+		- 0. Sair
 
 	Entre parentesis eh o que o usuario deve
 	digitar e pressionar enter para acessar.
  */
 void menuInicial() {
-	char opcao;
+	int opcao, opcoesValidas[] = { 0, 1, 2, -1 };
 	AgendaInfo *agenda = NULL;
 
 	limpaTela();
 	infoPrograma();
 
-	printf("(C)riar agenda\n(A)brir agenda\n(S)air\n\n");
+	printf("1. Criar agenda\n2. Abrir agenda\n0. Sair\n\n");
 
-	do {
-		printf("Opcao: ");
+	opcao = leOpcaoValida("Opcao: ", &opcoesValidas[0], "***Opcao invalida***\n");
 
-		opcao = leOpcao("CcAaSs");
-		if (!opcao) {
-			printf("***Opcao invalida***\n");
-		}
+	switch(opcao) {
+		case 1:
+			agenda = processoCriaAgenda();
 
-	} while(!opcao);
+			/* Se sucesso criando agenda */
+			if (agenda) {
+				processoAbreAgenda(agenda);
+				processoFinalizaAgenda(agenda);
+			}
 
-	if (opcao == 'C' || opcao == 'c') {
-		agenda = processoCriaAgenda();
+			break;
 
-		// Se sucesso criando agenda
-		if (agenda) {
-			processoAbreAgenda(agenda);
-		}
-	}
-	else if (opcao == 'A' || opcao == 'a') {
-		agenda = processoAbrirAgenda();
+		case 2:
+			agenda = processoAbrirAgenda();
 
-		// Se sucesso abrindo a agenda
-		if (agenda) {
-			processoAbreAgenda(agenda);
-		}
-	}
-	else if (opcao == 'S' || opcao == 's') {
-	}
-	else {
-		// De acordo com a logica, nunca poderia se chegar aqui...
-		printf("menuInicial: BUG!");
+			/* Se sucesso abrindo a agenda */
+			if (agenda) {
+				processoAbreAgenda(agenda);
+				processoFinalizaAgenda(agenda);
+			}
+
+			break;
+
+		/*
+		case '0':
+			break;
+		*/
 	}
 
-	// Limpa a tela ao finalizar a utilizacao do programa
+	/* Limpa a tela ao finalizar a utilizacao do programa */
 	limpaTela();
 }
 
 
+/**
+	Mostra as opcoes para lidar com a agenda aberta.
+	Recebe como parametro uma flag se a arvore de dados da agenda eh balanceada,
+	usando esta flag ele oferece ou nao a opcao de balanceamento estatico.
+ */
+void mostraMenuAgenda(char agendaBal) {
+	printf("1. Incluir\n2. Alterar\n3. Excluir\n4. Salvar\n5. Procurar\n6. Mostrar todos contatos\n7. Mostrar arvore\n");
 
+	if (!agendaBal) {
+		printf("8. Balancear estaticamente\n");
+	}
+
+	printf("0. Sair\n");
+}
