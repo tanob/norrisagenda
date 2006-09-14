@@ -235,10 +235,14 @@ int tempFile( Arv **arvore )
 	else
 	{
 		// salva informacoes no arquivo
-		fprintf( arq, "%d\n", raiz->info  );
-		fclose( arq );
-		tempFile( &(raiz->esq) );
-		tempFile( &(raiz->dir) );		
+		if ( raiz->info != 0 )
+		{
+			fprintf( arq, "%d\n", raiz->info  );
+			fclose( arq );
+			tempFile( &(raiz->esq) );
+			tempFile( &(raiz->dir) );
+		}
+				
 	}
 }
 
@@ -342,7 +346,7 @@ Arv *importAgenda( char *arquivo )
 	while ( !feof( arq ) )
 	{
 		fgets( linha, BUFFER, arq );		
-		info = atoi( linha );
+		info = atoi( linha );		
 		tInsere( &arvore, info );
 	}	
 	fclose( arq );
