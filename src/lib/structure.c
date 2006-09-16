@@ -122,14 +122,6 @@ ArvoreMista *_insereNoh(ArvoreMista *raiz, ArvoreMista *noh, char *cresceu) {
 	return raiz;
 }
 
-void mostra(ArvoreMista *m) {
-	if (m) {
-		printf("\t%s\n", m->contato->nome);
-		mostra(m->esq);
-		mostra(m->dir);
-	}
-}
-
 /**
  */
 int removeNoh(const char *elemento, ArvoreMista **raiz) {
@@ -199,8 +191,6 @@ int _removeNoh(const char *elemento, ArvoreMista **raiz, char *diminuiu)
 		subarv = (*raiz)->esq;
 		result = _removeNoh(elemento, &subarv, &menorsubarv);
 		(*raiz)->esq = subarv;
-
-		mostra(*raiz);
 
 		if (menorsubarv) {
 			switch((*raiz)->fb) {
