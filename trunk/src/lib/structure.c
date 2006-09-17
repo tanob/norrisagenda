@@ -18,7 +18,8 @@ ArvoreMista *balanceEsquerda(ArvoreMista *, char *);
 ArvoreMista *rebalanceEsquerda(ArvoreMista *, char *);
 ArvoreMista *rebalanceDireita(ArvoreMista *, char *);
 ArvoreMista *_insereNoh(ArvoreMista *, ArvoreMista *, char *);
-int _removeNoh(const char *, ArvoreMista **, char *);
+int removeNohAVL(const char *, ArvoreMista **, char *);
+int removeNohABB(ArvoreMista **p);
 
 
 /**
@@ -51,9 +52,24 @@ void finalizaAgendaInfo(AgendaInfo *agenda) {
 
 /**
  */
+void finalizaNohArvoreMista(ArvoreMista *noh) {
+	if (noh) {
+		if (noh->contato) {
+			free(noh->contato);
+		}
+
+		free(noh);
+	}
+}
+
+/**
+ */
 void finalizaArvoreMista(ArvoreMista *am) {
 	if (am) {
-		/* TODO: fazer funcao para percorrer pos-fixado, liberando as memorias alocadas */
+		finalizaArvoreMista(am->esq);
+		finalizaArvoreMista(am->dir);
+
+		finalizaNohArvoreMista(am);
 	}
 }
 
@@ -124,14 +140,71 @@ ArvoreMista *_insereNoh(ArvoreMista *raiz, ArvoreMista *noh, char *cresceu) {
 
 /**
  */
-int removeNoh(const char *elemento, ArvoreMista **raiz) {
-	char diminuiu = 0;
-	return _removeNoh(elemento, raiz, &diminuiu);
+int procuraRemoveNohABB(ArvoreMista **raiz, const char *nome) {
+	int result = -1;
+
+	if (!raiz || !(*raiz)) {
+		return -1;
+	}
+	else {
+		int cmp = strcasecmp(nome, (*raiz)->contato->nome);
+		if (!cmp) {
+			result = removeNohABB(raiz);
+		}
+		else if (cmp < 0) {
+			result = procuraRemoveNohABB(&(*raiz)->esq, nome);
+		}
+		else {
+			result = procuraRemoveNohABB(&(*raiz)->dir, nome);
+		}
+	}
+
+	return result;
 }
 
 /**
  */
-int _removeNoh(const char *elemento, ArvoreMista **raiz, char *diminuiu)
+int removeNoh(const char *elemento, ArvoreMista **raiz) {
+	int result = -1;
+	char diminuiu = 0;
+
+	if ((*raiz)->ehAVL) {
+		result = removeNohAVL(elemento, raiz, &diminuiu);
+	}
+	else {
+		result = procuraRemoveNohABB(raiz, elemento);
+	}
+
+	return result;
+}
+
+/**
+ */
+int removeNohABB(ArvoreMista **p) {
+	ArvoreMista *r = *p, *q;
+
+	if (!r) {
+		return -1;
+	}
+	else if (!r->dir) {
+		*p = r->esq;
+	}
+	else if (!r->esq) {
+		*p = r->dir;
+	}
+	else {
+		for (q=r->dir; q->esq; q=q->esq) ;
+		q->esq = r->esq;
+		*p = r->dir;
+	}
+
+	finalizaNohArvoreMista(r);
+	return 0;
+}
+
+/**
+ */
+int removeNohAVL(const char *elemento, ArvoreMista **raiz, char *diminuiu)
 {
 	int result = -1, cmp;
 	char menorsubarv = 0;
@@ -156,7 +229,7 @@ int _removeNoh(const char *elemento, ArvoreMista **raiz, char *diminuiu)
 			pred->contato = tmp;
 
 			subarv = (*raiz)->esq;
-			result = _removeNoh(elemento, &subarv, &menorsubarv);
+			result = removeNohAVL(elemento, &subarv, &menorsubarv);
 			(*raiz)->esq = subarv;
 
 			if (menorsubarv) {
@@ -179,8 +252,7 @@ int _removeNoh(const char *elemento, ArvoreMista **raiz, char *diminuiu)
 		}
 		else {
 			subarv = (!(*raiz)->esq) ? (*raiz)->dir : (*raiz)->esq;
-			free((*raiz)->contato);
-			free(*raiz);
+			finalizaNohArvoreMista(*raiz);
 
 			*raiz = subarv;
 			*diminuiu = 1;
@@ -189,7 +261,7 @@ int _removeNoh(const char *elemento, ArvoreMista **raiz, char *diminuiu)
 	}
 	else if (cmp < 0) {
 		subarv = (*raiz)->esq;
-		result = _removeNoh(elemento, &subarv, &menorsubarv);
+		result = removeNohAVL(elemento, &subarv, &menorsubarv);
 		(*raiz)->esq = subarv;
 
 		if (menorsubarv) {
@@ -212,7 +284,7 @@ int _removeNoh(const char *elemento, ArvoreMista **raiz, char *diminuiu)
 	}
 	else {
 		subarv = (*raiz)->dir;
-		result = _removeNoh(elemento, &subarv, &menorsubarv);
+		result = removeNohAVL(elemento, &subarv, &menorsubarv);
 		(*raiz)->dir = subarv;
 
 		if (menorsubarv) {
@@ -362,7 +434,7 @@ ArvoreMista *rebalanceDireita(ArvoreMista *raiz, char *diminuiu)
 
 	if (!raiz || !raiz->dir) {
 		fprintf(stderr, "rebalanceDireita: !raiz || !raiz->left\n");
-		return;
+		return NULL;
 	}
 
 	dirsub = raiz->dir;
@@ -408,7 +480,7 @@ ArvoreMista *rebalanceDireita(ArvoreMista *raiz, char *diminuiu)
 
 			break;
 	}
-	
+
 	return raiz;
 }
 
@@ -420,7 +492,7 @@ ArvoreMista *rebalanceEsquerda(ArvoreMista *raiz, char *diminuiu)
 
 	if (!raiz || !raiz->esq) {
 		fprintf(stderr, "rebalanceEsquerda: !raiz || !raiz->left\n");
-		return;
+		return NULL;
 	}
 
 	esqsub = raiz->esq;
@@ -466,7 +538,7 @@ ArvoreMista *rebalanceEsquerda(ArvoreMista *raiz, char *diminuiu)
 
 			break;
 	}
-	
+
 	return raiz;
 }
 
