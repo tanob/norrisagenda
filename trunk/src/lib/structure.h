@@ -4,6 +4,8 @@
 
 #ifndef _STRUCTURE_H
 
+#include <stdio.h>
+
 #define _STRUCTURE_H
 
 /**
@@ -57,5 +59,8 @@ void finalizaAgendaInfo(AgendaInfo *);
 void finalizaArvoreMista(ArvoreMista *);
 ArvoreMista *insereNoh(ArvoreMista *, ArvoreMista *);
 int removeNoh(const char *, ArvoreMista **);
+int alturaArvore(ArvoreMista *arv);
+void imprimeArvore(ArvoreMista *arv);
+void balanceEstatico(ArvoreMista **arv);
 
 #endif /* !_STRUCTURE_H */

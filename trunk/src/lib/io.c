@@ -34,9 +34,11 @@ int leOpcao(int *opcoesValidas, char *valido) {
 			opcoesValidas++;
 		}
 	}
+	/*
 	else {
 		while (getchar() != '\n') ;
 	}
+	*/
 
 	return *valido ? opcao : -1;
 }

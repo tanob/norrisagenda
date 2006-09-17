@@ -1,9 +1,12 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "processos.h"
 #include "io.h"
 #include "structure.h"
 #include "interface.h"
+#include "percorre.h"
 
 
 /**
@@ -45,11 +48,12 @@ AgendaInfo *processoAbrirAgenda() {
 
 /**
  */
-void processoSalvarAgenda(AgendaInfo *agenda) {
+int processoSalvarAgenda(AgendaInfo *agenda) {
 	/* TODO */
 
 	/* Ao final do processo, se tudo certo.. */
 	agenda->foiAlterada = 0;
+	return 0;
 }
 
 
@@ -85,9 +89,9 @@ void processoFinalizaAgenda(AgendaInfo *agenda) {
 		Sair
  */
 void processoAbreAgenda(AgendaInfo *agenda) {
-	char pedirPause = 0;
+	int pedirPause = 0;
 	int opcao, opcoesValidas[] = { 0, 1, 2, 3, 4, 5, 6, 7, -1, -1 };
-	void (*processos[])(AgendaInfo *) = { processoCriaContato, processoAlteraContato, processoExcluiContato,
+	int (*processos[])(AgendaInfo *) = { processoCriaContato, processoAlteraContato, processoExcluiContato,
 																				processoSalvarAgenda, processoProcuraContato, processoMostraContatos,
 																				processoMostraArvore, processoBalanceEstatico };
 
@@ -109,12 +113,12 @@ void processoAbreAgenda(AgendaInfo *agenda) {
 		opcao = leOpcaoValida("Opcao: ", &opcoesValidas[0], "***Opcao invalida***\n");
 
 		if (opcao > 0) {
-			/* Chama o processo de acordo com a opcao.. */
-			(*processos[opcao-1])(agenda);
-		}
+			/* Dah um espaco */
+			printf("\n\n");
 
-		/* Os processos que mostram dados devem pedir pausa */
-		pedirPause = (opcao >= 5 && opcao <= 7);
+			/* Chama o processo de acordo com a opcao.. */
+			pedirPause = (*processos[opcao-1])(agenda);
+		}
 
 	} while(opcao != 0);
 }
@@ -122,58 +126,209 @@ void processoAbreAgenda(AgendaInfo *agenda) {
 
 /**
  */
-void processoBalanceEstatico(AgendaInfo *agenda) {
-	/* TODO */
-	printf("processoBalanceEstatico: nao implementado ainda\n");
+ArvoreMista *criaNoh(Contato *contato, char ehAVL) {
+	ArvoreMista *p = malloc(sizeof(ArvoreMista));
+	p->contato = contato;
+	p->esq = p->dir = NULL;
+	p->fb = BAL;
+	p->ehAVL = ehAVL;
+	return p;
+}
+
+
+/**
+ */
+void mostraContato(const Contato *contato) {
+	printf("Nome: %s\nTelefone: %s\n\n", contato->nome, contato->telefone);
+}
+
+
+/**
+ */
+Contato *procuraContato(const ArvoreMista *arv, const char *nome) {
+	Contato *ret = NULL;
+	int cmp;
+
+	if (arv) {
+		cmp = strcasecmp(nome, arv->contato->nome);
+
+		if (!cmp) {
+			ret = arv->contato;
+		}
+		else if (cmp < 0) {
+			ret = procuraContato(arv->esq, nome);
+		}
+		else {
+			ret = procuraContato(arv->dir, nome);
+		}
+	}
+
+	return ret;
+}
+
+
+/**
+ */
+Contato *requisitaNomeEProcuraContato(const ArvoreMista *arv) {
+	Contato *contato = NULL;
+	char nome[50];
+
+	printf("Nome do contato: ");
+	fgets(nome, sizeof(nome), stdin);
+	nome[strlen(nome)-1] = '\0';
+
+	if (nome[0] == '\0') {
+		printf("\n***Nome invalido***\n");
+	}
+	else {
+		contato = procuraContato(arv, nome);
+
+		if (!contato) {
+			printf("\n***Contato nao existente***\n");
+		}
+	}
+
+	return contato;
+}
+
+
+/**
+ */
+int processoBalanceEstatico(AgendaInfo *agenda) {
+	balanceEstatico(&agenda->arv);
 
 	/* Apos o balanceamento a arvore deve ser considerada como modificada */
 	agenda->foiAlterada = 1;
+
+	return 0;
 }
 
 
 /**
  */
-void processoCriaContato(AgendaInfo *agenda) {
-	/* TODO */
-	printf("processoCriaContato: nao implementado ainda\n");
+int processoCriaContato(AgendaInfo *agenda) {
+	ArvoreMista *arv;
+	Contato *contato = malloc(sizeof(Contato));
+
+	printf("---Novo Contato---\nNome: ");
+	fgets(contato->nome, sizeof(contato->nome), stdin);
+	contato->nome[strlen(contato->nome)-1] = '\0';
+
+	if (contato->nome[0] == '\0') {
+		printf("\n***Nome invalido***\n\n");
+		free(contato);
+		return 1; /* Pede pause */
+	}
+
+	printf("Telefone: ");
+	fgets(contato->telefone, sizeof(contato->telefone), stdin);
+	contato->telefone[strlen(contato->telefone)-1] = '\0';
+
+	arv = criaNoh(contato, agenda->ehAVL);
+	agenda->arv = insereNoh(agenda->arv, arv);
+	agenda->foiAlterada = 1;
+
+	return 0;
 }
 
 
 /**
  */
-void processoAlteraContato(AgendaInfo *agenda) {
-	/* TODO */
-	printf("processoAlteraContato: nao implementado ainda\n");
+int processoAlteraContato(AgendaInfo *agenda) {
+	Contato *contato;
+	char novoTelefone[30], dadosAlterados = 0;
+
+	printf("---Alterar Contato---\n");
+
+	contato = requisitaNomeEProcuraContato(agenda->arv);
+	if (contato) {
+		printf("\n---Atualizar dados---\n");
+		printf("Telefone: %s\nNovo telefone (ENTER para manter o antigo): ", contato->telefone);
+
+		fgets(novoTelefone, sizeof(novoTelefone), stdin);
+		novoTelefone[strlen(novoTelefone)-1] = '\0';
+
+		if (novoTelefone[0] != '\0') {
+			strncpy(contato->telefone, novoTelefone, sizeof(contato->telefone));
+			dadosAlterados = 1;
+		}
+
+		if (dadosAlterados) {
+			printf("\n---Dados atualizados---\n");
+			mostraContato(contato);
+
+			agenda->foiAlterada = 1;
+		}
+		else {
+			printf("\n***Nenhum dado atualizado***\n");
+		}
+	}
+
+	return 1;
 }
 
 
 /**
  */
-void processoExcluiContato(AgendaInfo *agenda) {
-	/* TODO */
-	printf("processoExcluiContato: nao implementado ainda\n");
+int processoExcluiContato(AgendaInfo *agenda) {
+	char nome[50];
+	int result;
+
+	printf("---Excluir Contato---\nNome do contato a ser excluido: ");
+	fgets(nome, sizeof(nome), stdin);
+	nome[strlen(nome)-1] = '\0';
+
+	result = removeNoh(nome, &agenda->arv);
+	if (result > 0) {
+		printf("\n***Contato removido***\n");
+		agenda->foiAlterada = 1;
+	}
+	else {
+		printf("\n***Contato nao existente***\n");
+	}
+
+	return 1;
 }
 
 
 /**
  */
-void processoProcuraContato(AgendaInfo *agenda) {
-	/* TODO */
-	printf("processoProcuraContato: nao implementado ainda\n");
+int processoProcuraContato(AgendaInfo *agenda) {
+	Contato *contato;
+
+	printf("---Procurar Contato---\n");
+
+	contato = requisitaNomeEProcuraContato(agenda->arv);
+	if (contato) {
+		printf("\n---Contato encontrado---\n");
+		mostraContato(contato);
+	}
+
+	return 1;
 }
 
 
 /**
  */
-void processoMostraContatos(AgendaInfo *agenda) {
-	/* TODO */
-	printf("processoMostraContatos: nao implementado ainda\n");
+void _mostraContato(ArvoreMista *p, void *param) {
+	Contato *contato = p->contato;
+	mostraContato(contato);
 }
 
 
 /**
  */
-void processoMostraArvore(AgendaInfo *agenda) {
-	/* TODO */
-	printf("processoMostraArvore: nao implementado ainda\n");
+int processoMostraContatos(AgendaInfo *agenda) {
+	printf("---Contatos cadastrados---\n\n");
+	percorreInfixado(agenda->arv, _mostraContato, NULL);
+	return 1;
+}
+
+
+/**
+ */
+int processoMostraArvore(AgendaInfo *agenda) {
+	printf("---Arvore de contatos---\n\n");
+	imprimeArvore(agenda->arv);
+	return 1;
 }
