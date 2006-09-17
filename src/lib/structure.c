@@ -9,6 +9,8 @@
 #include "structure.h"
 #include "io.h"
 #include "interface.h"
+#include "listdesc.h"
+#include "percorre.h"
 
 /**
 	Prototipos
@@ -542,3 +544,107 @@ ArvoreMista *rebalanceEsquerda(ArvoreMista *raiz, char *diminuiu)
 	return raiz;
 }
 
+/**
+ */
+int alturaArvore(ArvoreMista *arv) {
+    int he, hd;
+    if (arv == NULL) {
+        return -1;
+    }
+
+    he = alturaArvore(arv->esq);
+    hd = alturaArvore(arv->dir);
+
+    return (he > hd ? he : hd) + 1;
+}
+
+/**
+ */
+void _imprimeArvore(ArvoreMista *arv, int h) {
+    int i;
+    if (arv != NULL) {
+        _imprimeArvore(arv->esq, h-1);
+        for (i=0; i < h; i++) printf("\t");
+        printf("%s\n", arv->contato->nome);
+        _imprimeArvore(arv->dir, h-1);
+    }
+}
+
+/**
+ */
+void imprimeArvore(ArvoreMista *arv) {
+	_imprimeArvore(arv, alturaArvore(arv));
+}
+
+/**
+  Funcoes para balancear estaticamente a arvore
+ */
+
+/**
+ */
+void _cbInsereDadoArvEmLista(ArvoreMista *p, void *param) {
+  descritorLista *dl = (descritorLista *) param;
+  Contato *contato = p->contato;
+  descValor *dv = criaDescValor(contato, sizeof(Contato *));
+
+  insereNoDireitaLista(dl, dv);
+
+  liberaDescValor(dv);
+  p->contato = NULL; /* Assim, qdo balanceEstatico() chamar finalizaArvoreMista, os contatos nao serao desalocados */
+}
+
+/**
+ */
+descritorLista *transArvEmLista(ArvoreMista *arv) {
+  descritorLista *dl = criaDescritorLista();
+
+  percorreInfixado(arv, _cbInsereDadoArvEmLista, (descritorLista *) dl);
+
+  return dl;
+}
+
+/**
+ */
+void criaArvoreBalViaVetor(ArvoreMista **arv, descritorLista *dl, int inicio, int fim) {
+  ArvoreMista *subArv;
+  descValor *dv;
+  Contato *contato;
+  int posmeio;
+
+	//printf("criaArvoreBalViaVetor: begin\n");
+
+  if (inicio <= fim) {
+    posmeio = (inicio+fim) / 2;
+    dv = buscaNoPosicao(dl, posmeio);
+    contato = (Contato *) dv->dado;
+
+    subArv = malloc(sizeof(ArvoreMista));
+    subArv->contato = contato;
+    subArv->esq = subArv->dir = NULL;
+    subArv->fb = BAL;
+    subArv->ehAVL = 0;
+
+    *arv = insereNoh(*arv, subArv);
+    criaArvoreBalViaVetor(&(*arv)->esq, dl, inicio, posmeio-1);
+    criaArvoreBalViaVetor(&(*arv)->dir, dl, posmeio+1, fim);
+  }
+  else {
+    *arv = NULL;
+  }
+
+  //printf("criaArvoreBalViaVetor: end\n");
+}
+
+/**
+ */
+void balanceEstatico(ArvoreMista **arv) {
+  ArvoreMista *novaArv = NULL;
+  descritorLista *dl = transArvEmLista(*arv);
+
+  criaArvoreBalViaVetor(&novaArv, dl, 0, tamanhoLista(dl)-1);
+
+  liberaDescritorLista(dl);
+  finalizaArvoreMista(*arv);
+
+  *arv = novaArv;
+}

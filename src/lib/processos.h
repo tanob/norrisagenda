@@ -10,17 +10,17 @@
 AgendaInfo *processoCriaAgenda();
 AgendaInfo *processoAbrirAgenda();
 
-void processoCriaContato(AgendaInfo *);
-void processoAlteraContato(AgendaInfo *);
-void processoSalvarAgenda(AgendaInfo *);
+int processoCriaContato(AgendaInfo *);
+int processoAlteraContato(AgendaInfo *);
+int processoSalvarAgenda(AgendaInfo *);
 void processoFinalizaAgenda(AgendaInfo *);
 void processoAbreAgenda(AgendaInfo *);
-void processoBalanceEstatico(AgendaInfo *);
-void processoExcluiContato(AgendaInfo *);
-void processoSalvarAgenda(AgendaInfo *);
-void processoProcuraContato(AgendaInfo *);
-void processoMostraContatos(AgendaInfo *);
-void processoMostraArvore(AgendaInfo *);
-void processoBalanceEstatico(AgendaInfo *);
+int processoBalanceEstatico(AgendaInfo *);
+int processoExcluiContato(AgendaInfo *);
+int processoSalvarAgenda(AgendaInfo *);
+int processoProcuraContato(AgendaInfo *);
+int processoMostraContatos(AgendaInfo *);
+int processoMostraArvore(AgendaInfo *);
+int processoBalanceEstatico(AgendaInfo *);
 
 #endif /* !_PROCESSOS_H */
