@@ -45,14 +45,19 @@ AgendaInfo *processoCriaAgenda() {
  */
 AgendaInfo *processoAbrirAgenda() {
 	char nome[50];
-	char caminho[50];		
-	limpaTela();
-	printf("\n\nNome da agenda que deseja abrir:");
+	char caminho[50], ehAVL;
+	int opcao, snOpcoes[] = { 1, 2 };
+
+	printf("\n\n---Abrir Agenda---\nNome da agenda que deseja abrir: ");
 	fgets(nome, sizeof(nome), stdin);
 	nome[strlen(nome) - 1] = '\0';
 	strcpy(caminho, DIR);
-	strcat(caminho, nome);	
-	return import( caminho );
+	strcat(caminho, nome);
+
+	opcao = leOpcaoValida("---Arvore balanceada? (1. Sim, 2. Nao) ", &snOpcoes[0], "***Opcao invalida***\n");
+	ehAVL = (opcao == 1 ? 1 : 0);
+
+	return import( caminho, ehAVL );
 }
 
 
@@ -60,20 +65,21 @@ AgendaInfo *processoAbrirAgenda() {
  */
 int processoSalvarAgenda(AgendaInfo *agenda) {
 	char nome[50];
-	
-	limpaTela();
-	printf("\n\nNome da agenda a salvar:");
+
+	printf("\n\n---Salvar Agenda---\nNome da agenda a salvar: ");
 	fgets(nome, sizeof(nome), stdin);
-	
-	//hack
-	nome[ strlen( nome ) - 1 ] = '\0';		
-	
+	nome[ strlen( nome ) - 1 ] = '\0';
+
 	if ( _salvaArquivo( agenda, nome ) ) {
 		/* Ao final do processo, se tudo certo.. */
 		agenda->foiAlterada = 0;
-		return 1;	
 	}
-	return 0;	
+	else {
+		printf("\n***Erro salvando agenda***\n");
+		return 1; /* Pede pause */
+	}
+
+	return 0;
 }
 
 
@@ -87,7 +93,7 @@ void processoFinalizaAgenda(AgendaInfo *agenda) {
 		opcao = leOpcaoValida(msg, &snOpcoes[0], "***Opcao invalida***\n");
 
 		if (opcao == 1) {
-			processoSalvarAgenda(agenda);
+			while (processoSalvarAgenda(agenda)) ;
 		}
 	}
 

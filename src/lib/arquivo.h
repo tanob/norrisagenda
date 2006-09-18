@@ -1,4 +1,4 @@
 #include "structure.h"
 
 int _salvaArquivo( AgendaInfo *agenda, char *nome );
-AgendaInfo *import( char *nomeAgenda );
+AgendaInfo *import( char *nomeAgenda, char ehAVL );
