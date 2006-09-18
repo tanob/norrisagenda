@@ -52,7 +52,9 @@ int copiaArquivo( char *nomeArq1, char *nomeArq2 )
 		while ( !feof( arq1 ) )
       	{
         	caracter = getc( arq1 );
-        	putc( caracter, arq2 );
+			if ( !feof(arq1) ) {
+        		putc( caracter, arq2 );
+			}
       	}
     	fclose( arq1 );
 		fclose( arq2 );		
