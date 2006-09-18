@@ -66,7 +66,14 @@ void menuInicial() {
 			break;
 
 		case 2:
-			agenda = processoAbrirAgenda();
+			do {
+				/* Enquanto nao conseguir abrir a agenda.. */
+				agenda = processoAbrirAgenda();
+				if (!agenda) {
+					printf("\n***Erro abrindo agenda***\n");
+				}
+
+			} while(!agenda);
 
 			/* Se sucesso abrindo a agenda */
 			if (agenda) {
