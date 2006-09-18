@@ -8,6 +8,7 @@
 #include "structure.h"
 #include "arquivo.h"
 #include "processos.h"
+#include "percorre.h"
 
 
 #define DIR "dados/"
@@ -15,18 +16,23 @@
 
 
 /**
-	salva arquivo temporário para usar nas operações de salvar nova agenda
+ */
+void gravaContato(ArvoreMista *arv, void *param) {
+    FILE *arquivo = (FILE *) param;
+    fprintf( arquivo, "%s#%s\n", arv->contato->nome, arv->contato->telefone );
+}
+
+/**
+	salva arquivo temporario para usar nas operacoes de salvar nova agenda
 	nao pondo em risco os arquivos verdadeiros
 */
 void tempFile( ArvoreMista *arv ) {
 
 	FILE *arquivo;
-	if ( ( arquivo = fopen("temp.dat~", "a" ) ) != NULL && arv != NULL )
+	if ( arv != NULL && ( arquivo = fopen("temp.dat~", "a" ) ) != NULL )
 	{
-		fprintf( arquivo, "%s#%s\n", arv->contato->nome, arv->contato->telefone );
-		fclose( arquivo );
-		tempFile( arv->esq );
-		tempFile( arv->dir );
+    	 percorrePrefixado(arv, gravaContato, (FILE *) arquivo);
+	     fclose(arquivo);
 	}
 }
 
@@ -87,7 +93,11 @@ int _salvaArquivo( AgendaInfo *agenda, char *nome ) {
 	tempFile( agenda->arv );
 
     if (access(DIR, F_OK) != 0) {
+#ifdef LINUX
+        mkdir(DIR, 0777);
+#else
         mkdir(DIR);
+#endif
     }
 
 	if ( copiaArquivo("temp.dat~", nomeBackup) && copiaArquivo("temp.dat~", nomeAgenda) ) {
@@ -163,7 +173,6 @@ AgendaInfo *import( char *nomeAgenda, char ehAVL ) {
 
 	}
 
-	//info = malloc( sizeof( AgendaInfo ) );
 	info = inicAgendaInfo();
 	info->ehAVL = ehAVL;
 	info->arv = arvore;
