@@ -4,6 +4,8 @@
 
 #include "structure.h"
 #include "arquivo.h"
+#include "processos.h"
+
 
 #define DIR "dados/"
 #define BUFFER 100
@@ -24,24 +26,6 @@ void tempFile( ArvoreMista *arv ) {
 		tempFile( arv->dir );		
 	}		
 }
-
-
-/*
-// inclui o indice avisando se é AVL ou não
-void indice( AgendaInfo *agenda ) {
-	
-	FILE *arquivo;
-	
-	if ( arquivo = fopen("temp.dat~", "a") ) {
-		if ( agenda->ehAVL == 1 ) {
-			fprintf( arquivo, "##1\n" );
-		} else {
-			fprintf( arquivo, "##0\n" );
-		}
-		fclose( arquivo );	
-	}
-}
-*/
 
 
 /** 
@@ -107,16 +91,35 @@ int _salvaArquivo( AgendaInfo *agenda, char *nome ) {
 
 AgendaInfo *import( char *nomeAgenda ) {
 	FILE *arquivo;
+	ArvoreMista *arvore = NULL;
+	ArvoreMista *noh = NULL;
+	AgendaInfo *info = NULL;
+	Contato *contato = NULL;
+	
 	char linha[BUFFER];
 	char nome[50] = "";
 	char telefone[50] = "";
+	
+	char agenda[50];
+	char backup[50];
+		
 	int index = 0;
 	int index2 = 0;
 		
-	//abre arquivo
-	arquivo = fopen(nomeAgenda, "r");
-	if ( !arquivo ) 
-		return NULL;
+	
+	strcpy( agenda, nomeAgenda );
+	strcpy( backup, nomeAgenda );
+	
+	strcat( agenda, ".dat" );
+	strcat( backup, ".bkp" );
+	
+	//tenta abrir agenda se nao conseguir tenta abrir backup
+	if ( ( arquivo = fopen( agenda, "r")) == NULL ) {
+		if ( ( arquivo = fopen( backup, "r" )) == NULL ) {
+			return NULL;
+		}
+	}
+	
 	
 	while ( !feof( arquivo ) ) {
 		fgets( linha, BUFFER, arquivo );
@@ -135,14 +138,24 @@ AgendaInfo *import( char *nomeAgenda ) {
 		for ( index = index + 1, index2 = 0; linha[index] != '\n'; index++, index2++ ) {
 			telefone[index2] = linha[index];
 		}		
-		telefone[index2] = '\0';
+		telefone[index2] = '\0';	
 		
-		// insere no na arvore
-		printf("Nome:%s\n", nome);
-		printf("Telefone:%s\n\n", telefone);
-				
-	}		
-	getchar();	
-	return NULL;
+		contato = malloc( sizeof( Contato ) );
+		strcpy( contato->nome, nome  );
+		strcpy( contato->telefone, telefone  );
+		
+		
+		noh = malloc(sizeof(ArvoreMista)); 
+		noh->contato = contato; 
+		noh->esq = noh->dir = NULL; 
+		noh->fb = BAL; 
+		noh->ehAVL = 0;		
+		arvore = insereNoh( arvore, noh );								
+		
+	}
+	
+	info = malloc( sizeof( AgendaInfo ) );
+	info->arv = arvore;
+	return info;	
 }
 

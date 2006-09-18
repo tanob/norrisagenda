@@ -45,22 +45,14 @@ AgendaInfo *processoCriaAgenda() {
  */
 AgendaInfo *processoAbrirAgenda() {
 	char nome[50];
-	char caminho[50];
-	//int stop;
-		
+	char caminho[50];		
 	limpaTela();
 	printf("\n\nNome da agenda que deseja abrir:");
 	fgets(nome, sizeof(nome), stdin);
 	nome[strlen(nome) - 1] = '\0';
 	strcpy(caminho, DIR);
-	strcat(caminho, nome);
-	strcat(caminho, ".dat");
-	if ( arquivoExiste( caminho ) ) {
-		import( caminho );
-		return NULL;
-	}else {	
-		return NULL;
-	}
+	strcat(caminho, nome);	
+	return import( caminho );
 }
 
 
