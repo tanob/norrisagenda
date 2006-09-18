@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #include "structure.h"
 #include "arquivo.h"
@@ -82,6 +85,10 @@ int _salvaArquivo( AgendaInfo *agenda, char *nome ) {
 	remove("temp.dat~");
 
 	tempFile( agenda->arv );
+
+    if (access(DIR, F_OK) != 0) {
+        mkdir(DIR);
+    }
 
 	if ( copiaArquivo("temp.dat~", nomeBackup) && copiaArquivo("temp.dat~", nomeAgenda) ) {
 		remove("temp.dat~");
