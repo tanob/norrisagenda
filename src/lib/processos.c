@@ -7,6 +7,9 @@
 #include "structure.h"
 #include "interface.h"
 #include "percorre.h"
+#include "arquivo.h"
+
+#define DIR "dados/"
 
 
 /**
@@ -41,19 +44,44 @@ AgendaInfo *processoCriaAgenda() {
 	de preencher alguma informacao na estrutura AgendaInfo.
  */
 AgendaInfo *processoAbrirAgenda() {
-	/* TODO */
-	return NULL;
+	char nome[50];
+	char caminho[50];
+	//int stop;
+		
+	limpaTela();
+	printf("\n\nNome da agenda que deseja abrir:");
+	fgets(nome, sizeof(nome), stdin);
+	nome[strlen(nome) - 1] = '\0';
+	strcpy(caminho, DIR);
+	strcat(caminho, nome);
+	strcat(caminho, ".dat");
+	if ( arquivoExiste( caminho ) ) {
+		import( caminho );
+		return NULL;
+	}else {	
+		return NULL;
+	}
 }
 
 
 /**
  */
 int processoSalvarAgenda(AgendaInfo *agenda) {
-	/* TODO */
-
-	/* Ao final do processo, se tudo certo.. */
-	agenda->foiAlterada = 0;
-	return 0;
+	char nome[50];
+	
+	limpaTela();
+	printf("\n\nNome da agenda a salvar:");
+	fgets(nome, sizeof(nome), stdin);
+	
+	//hack
+	nome[ strlen( nome ) - 1 ] = '\0';		
+	
+	if ( _salvaArquivo( agenda, nome ) ) {
+		/* Ao final do processo, se tudo certo.. */
+		agenda->foiAlterada = 0;
+		return 1;	
+	}
+	return 0;	
 }
 
 
