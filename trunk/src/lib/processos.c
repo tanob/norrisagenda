@@ -66,19 +66,17 @@ AgendaInfo *processoAbrirAgenda() {
 int processoSalvarAgenda(AgendaInfo *agenda) {
 	char nome[50];
 
-	printf("\n\n---Salvar Agenda---\nNome da agenda a salvar: ");
-	fgets(nome, sizeof(nome), stdin);
-    
+	do {
+		printf("\n\n---Salvar Agenda---\nNome da agenda a salvar: ");
+		fgets(nome, sizeof(nome), stdin);
+
     nome[ strlen( nome ) - 1 ] = '\0';
-    
+
     if ( strlen( nome ) ==  0 ) {
-        printf("\n\nNome de arquivo inválido!!!");
-        getchar();
-        limpaTela();
-        processoSalvarAgenda( &(*agenda) );
+        printf("\n\n***Nome de arquivo invalido***");
     }
-    
-	
+
+	} while(!strlen(nome));
 
 	if ( _salvaArquivo( agenda, nome ) ) {
 		/* Ao final do processo, se tudo certo.. */
