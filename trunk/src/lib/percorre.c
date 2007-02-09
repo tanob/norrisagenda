@@ -20,9 +20,9 @@ void percorrePrefixado(ArvoreMista *arv, void (*visita)(ArvoreMista *, void *), 
  */
 void percorreInfixado(ArvoreMista *arv, void (*visita)(ArvoreMista *, void *), void *param) {
 	if (arv) {
-		percorrePrefixado(arv->esq, visita, param);
+		percorreInfixado(arv->esq, visita, param);
 		(*visita)(arv, param);
-		percorrePrefixado(arv->dir, visita, param);
+		percorreInfixado(arv->dir, visita, param);
 	}
 }
 
@@ -30,8 +30,8 @@ void percorreInfixado(ArvoreMista *arv, void (*visita)(ArvoreMista *, void *), v
  */
 void percorrePosfixado(ArvoreMista *arv, void (*visita)(ArvoreMista *, void *), void *param) {
 	if (arv) {
-		percorrePrefixado(arv->esq, visita, param);
-		percorrePrefixado(arv->dir, visita, param);
+		percorrePosfixado(arv->esq, visita, param);
+		percorrePosfixado(arv->dir, visita, param);
 		(*visita)(arv, param);
 	}
 }
