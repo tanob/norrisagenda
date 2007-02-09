@@ -70,11 +70,11 @@ int processoSalvarAgenda(AgendaInfo *agenda) {
 		printf("\n\n---Salvar Agenda---\nNome da agenda a salvar: ");
 		fgets(nome, sizeof(nome), stdin);
 
-    nome[ strlen( nome ) - 1 ] = '\0';
+		nome[ strlen( nome ) - 1 ] = '\0';
 
-    if ( strlen( nome ) ==  0 ) {
-        printf("\n\n***Nome de arquivo invalido***");
-    }
+		if ( strlen( nome ) ==  0 ) {
+        	printf("\n\n***Nome de arquivo invalido***");
+		}
 
 	} while(!strlen(nome));
 

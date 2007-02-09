@@ -143,10 +143,10 @@ ArvoreMista *_insereNoh(ArvoreMista *raiz, ArvoreMista *noh, char *cresceu) {
 /**
  */
 int procuraRemoveNohABB(ArvoreMista **raiz, const char *nome) {
-	int result = -1;
+	int result = 0;
 
 	if (!raiz || !(*raiz)) {
-		return -1;
+		return 0;
 	}
 	else {
 		int cmp = strcasecmp(nome, (*raiz)->contato->nome);
@@ -167,7 +167,7 @@ int procuraRemoveNohABB(ArvoreMista **raiz, const char *nome) {
 /**
  */
 int removeNoh(const char *elemento, ArvoreMista **raiz) {
-	int result = -1;
+	int result = 0;
 	char diminuiu = 0;
 
 	if ((*raiz)->ehAVL) {
@@ -201,14 +201,14 @@ int removeNohABB(ArvoreMista **p) {
 	}
 
 	finalizaNohArvoreMista(r);
-	return 0;
+	return 1;
 }
 
 /**
  */
 int removeNohAVL(const char *elemento, ArvoreMista **raiz, char *diminuiu)
 {
-	int result = -1, cmp;
+	int result = 0, cmp;
 	char menorsubarv = 0;
 	ArvoreMista *subarv;
 
